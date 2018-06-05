@@ -17,5 +17,5 @@ dependencies {
 }
 
 application {
-    mainClassName = "samples.HelloWorldKt"
+    mainClassName = "it.intre.kcc.raffle.RaffleKt"
 }

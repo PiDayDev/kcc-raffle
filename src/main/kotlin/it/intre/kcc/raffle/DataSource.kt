@@ -1,5 +1,7 @@
 package it.intre.kcc.raffle
 
+import java.io.File
+
 interface DataSource {
 
     fun getAttendees(): List<Attendee>
@@ -21,4 +23,18 @@ class MemoryDataSource : DataSource {
             Prize("Lorem", "wow"),
             Prize("Ipsum", "nice")
     )
+}
+
+class CsvDataSource : DataSource {
+
+    override fun getAttendees(): List<Attendee> = list("attendees.csv").map { Attendee(it[0], it[1], it[2]) }
+
+    override fun getPrizes(): List<Prize> = list("prizes.csv").map { Prize(it[0], it[1]) }
+
+    private fun list(file: String): List<List<String>> = File(ClassLoader.getSystemResource(file).file)
+                .readLines()
+                .drop(1) // field names
+                .distinct() // no duplicates
+                .map { it.split(",") }
+
 }

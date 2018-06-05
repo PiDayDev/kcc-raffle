@@ -5,19 +5,21 @@ sealed class Setup {
 }
 
 class TestSetup : Setup() {
-    override fun setup(): Pair<Engine, Output> {
-        val dataSource = MemoryDataSource()
-        val output = StdOutput()
-        val store = Store(dataSource)
-        val engine = ZeroSuspenseEngine(store)
-        return Pair(engine, output)
-    }
+    override fun setup() = ZeroSuspenseEngine(Store(MemoryDataSource())) to StdOutput()
+}
+
+class RealSetup:Setup(){
+    override fun setup() = TrulyRandomEngine(Store(CsvDataSource())) to StdOutput()
 }
 
 
 fun main(args: Array<String>) {
 
-    val (engine, output) = TestSetup().setup()
+    val testSetup =
+            RealSetup()
+            //TestSetup()
+
+    val (engine, output) = testSetup.setup()
 
     drawPrizes(engine, output)
 
@@ -30,5 +32,6 @@ private fun drawPrizes(engine: Engine, output: Output) {
         val result = e.drawPrize()
         output.print(result)
         e -= result
+        readLine()
     }
 }

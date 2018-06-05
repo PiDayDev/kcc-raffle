@@ -11,13 +11,13 @@ class StdOutput : Output() {
 
     override fun print(attendee: Attendee, prize: Prize) {
         println("""
-            ------------------------------------------
-            ${attendee.firstName} ${attendee.lastName}
-              wins
-            ${prize.name}! (${prize.details})
-            ------------------------------------------
+------------------------------------------
+${attendee.firstName} ${attendee.lastName}
+wins
+${prize.name}! (${prize.details})
+------------------------------------------
 
-            """.trimIndent())
+""".trimIndent())
         }
 
 }
