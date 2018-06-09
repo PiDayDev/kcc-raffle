@@ -104,7 +104,7 @@ private fun Stage.recap() {
                 columns.addAll(
                         column("#", 5) { "${it.pos}" },
                         column("Winner", 40) { "${it.winner}" },
-                        column("Prize", 54) { "${it.prize})" }
+                        column("Prize", 54) { "${it.prize}" }
                 )
                 items = FXCollections.observableArrayList(results)
                 minWidth = 3 * W
