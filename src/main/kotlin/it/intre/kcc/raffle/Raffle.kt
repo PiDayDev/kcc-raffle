@@ -1,26 +1,28 @@
 package it.intre.kcc.raffle
 
-sealed class Raffle(val engine: Engine, val input: Input, val output: Output) {
+sealed class Raffle(val engine: Engine, val inout: InputOutput) {
 
     fun drawPrizes() {
-        var e = engine
-        while (e.hasMorePrizes()) {
-            val result = e.drawPrize()
-            output.print(result)
-            e -= result
-            input.read()
+        while (engine.hasPrizes()) {
+            val prize = engine.nextPrize()
+            val winner = engine.nextWinner()
+            inout.print(Result(winner, prize))
+            inout.read()
         }
     }
 
 }
 
-class TestRaffle : Raffle(ZeroSuspenseEngine(Store(MemoryDataSource())), StdInput(), StdOutput())
+class TestRaffle : Raffle(ZeroSuspenseEngine(Store(MemoryDataSource())), StdInOut())
 
-class ActualRaffle : Raffle(TrulyRandomEngine(Store(CsvDataSource())), StdInput(), StdOutput())
+class RndTestRaffle : Raffle(TrulyRandomEngine(Store(MemoryDataSource())), StdInOut())
+
+class ActualRaffle : Raffle(TrulyRandomEngine(Store(CsvDataSource())), WindowOutput())
 
 fun main(args: Array<String>) {
-    val raffle = ActualRaffle()
-    //TestRaffle()
+    val raffle =
+            //ActualRaffle()
+            RndTestRaffle()
     raffle.drawPrizes()
 }
 

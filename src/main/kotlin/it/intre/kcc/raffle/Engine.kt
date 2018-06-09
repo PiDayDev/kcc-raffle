@@ -2,20 +2,19 @@ package it.intre.kcc.raffle
 
 import java.security.SecureRandom
 
-abstract class Engine(val store: Store) {
+abstract class Engine(var store: Store) {
 
-    fun hasMorePrizes() = store.prizes.isNotEmpty() && store.attendees.isNotEmpty()
+    fun hasPrizes() = store.prizes.isNotEmpty()
+    fun hasAttendees() = store.attendees.isNotEmpty()
 
-    abstract fun drawPrize(): Result
+    fun nextPrize(): Prize = if (hasPrizes()) store.prizes.removeAt(0) else NONE
+    abstract fun nextWinner(): Attendee
 
-    abstract operator fun minus(result: Result): Engine
 }
 
 class ZeroSuspenseEngine(store: Store) : Engine(store) {
 
-    override fun drawPrize(): Result = Result(store.attendees[0], store.prizes[0])
-
-    override fun minus(result: Result) = ZeroSuspenseEngine(store - result)
+    override fun nextWinner(): Attendee = store.attendees.removeAt(0)
 
 }
 
@@ -23,10 +22,8 @@ class TrulyRandomEngine(store: Store) : Engine(store) {
 
     private val rnd = SecureRandom()
 
-    override fun drawPrize(): Result = Result(store.attendees.random(), store.prizes[0])
+    override fun nextWinner(): Attendee = if (hasAttendees()) store.attendees.removeAtRandom() else NOBODY
 
-    private fun <T> List<T>.random() = this[rnd.nextInt(size)]
-
-    override fun minus(result: Result) = TrulyRandomEngine(store - result)
+    private fun <T> MutableList<T>.removeAtRandom() = removeAt(rnd.nextInt(size))
 
 }

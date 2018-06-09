@@ -1,15 +1,9 @@
 package it.intre.kcc.raffle
 
 data class Store(
-        val attendees: List<Attendee>,
-        val prizes: List<Prize>
+        val attendees: MutableList<Attendee>,
+        val prizes: MutableList<Prize>
 ) {
-    constructor(dataSource: DataSource) : this(dataSource.getAttendees(), dataSource.getPrizes())
-
-    operator fun minus(result: Result) = Store(attendees - result.winner, prizes - result.prize)
+    constructor(dataSource: DataSource) : this(dataSource.getAttendees().toMutableList(), dataSource.getPrizes().toMutableList())
 }
 
-data class Result(
-        val winner: Attendee = NOBODY,
-        val prize: Prize = NONE
-)

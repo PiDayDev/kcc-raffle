@@ -20,8 +20,10 @@ class MemoryDataSource : DataSource {
     )
 
     override fun getPrizes(): List<Prize> = listOf(
-            Prize("Lorem", "wow"),
-            Prize("Ipsum", "nice")
+            Prize("Lorem", "1", "img.jpg"),
+            Prize("Lorem", "2", "img.jpg"),
+            Prize("Lorem", "3", "img.jpg"),
+            Prize("Ipsum", "nice", "img.jpg")
     )
 }
 
@@ -29,12 +31,12 @@ class CsvDataSource : DataSource {
 
     override fun getAttendees(): List<Attendee> = list("attendees.csv").map { Attendee(it[0], it[1], it[2]) }
 
-    override fun getPrizes(): List<Prize> = list("prizes.csv").map { Prize(it[0], it[1]) }
+    override fun getPrizes(): List<Prize> = list("prizes.csv").map { Prize(it[0], it[1], it[2], it[3]) }
 
     private fun list(file: String): List<List<String>> = File(ClassLoader.getSystemResource(file).file)
-                .readLines()
-                .drop(1) // field names
-                .distinct() // no duplicates
-                .map { it.split(",") }
+            .readLines()
+            .drop(1) // field names
+            .distinct() // no duplicates
+            .map { it.split(",") }
 
 }
