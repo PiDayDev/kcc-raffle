@@ -71,3 +71,4 @@ fabric.properties
 
 
 src/main/resources/*.csv
+.idea/**/*.log
