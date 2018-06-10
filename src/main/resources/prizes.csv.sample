@@ -1,4 +1,4 @@
-﻿Name,Description,Image,Secret
-Participation medal,Thank you for being here,none.png,secret-1
-Useless award,Nobody cares about this,none.png,secret-2
-Top prize,Everyone will envy you now!,none.png,secret-3
+﻿#,Name,Description,Image,Secret
+3,Participation medal,Thank you for being here,none.png,secret-1
+2,Useless award,Nobody cares about this,none.png,secret-2
+1,Top prize,Everyone will envy you now!,none.png,secret-3

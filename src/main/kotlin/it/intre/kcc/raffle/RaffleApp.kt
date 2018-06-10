@@ -6,9 +6,11 @@ import javafx.beans.property.ReadOnlyObjectWrapper
 import javafx.collections.FXCollections
 import javafx.geometry.Insets
 import javafx.geometry.Pos
+import javafx.scene.Cursor
 import javafx.scene.Parent
 import javafx.scene.Scene
 import javafx.scene.control.Button
+import javafx.scene.control.TableCell
 import javafx.scene.control.TableColumn
 import javafx.scene.control.TableView
 import javafx.scene.image.Image
@@ -40,8 +42,10 @@ class RaffleApp : Application() {
 const val ICON = "logo.png"
 const val W = 800 * 1.618 / 4
 const val H = 800.0 / 8
-const val H1 = H * 0.80
-const val H3 = H * 0.45
+const val FONT_HEIGHT_TITLE = H * 0.80
+const val FONT_HEIGHT_NOTES = H * 0.50
+const val FONT_HEIGHT_RECAP = H * 0.185
+const val FONT_HEIGHT_BUTTON = H * 0.45
 const val PAD = 10.0
 
 val engine = TrulyRandomEngine(Store(CsvDataSource()))
@@ -53,9 +57,10 @@ val logger = LoggerFactory.getLogger("KCC")!!
 private fun Stage.welcome() {
     scene = KccScene {
         KccImageGrid(
-                "#KCC18",
+                "Milan Kotlin Community Conf",
                 ICON,
-                "raffle",
+                "#KCC18 raffle",
+                "We have a staggering total of ${engine.store.prizes.size} prizes!",
                 KccButton("LET'S GO !") { nextPrize() }
         )
     }
@@ -69,8 +74,9 @@ private fun Stage.nextPrize() {
     }
     scene = KccScene {
         KccImageGrid(
-                prize.name,
+                "Prize #${prize.pos}",
                 prize.image,
+                prize.name,
                 prize.descr,
                 KccButton("DRAW !") { nextWinner(prize) }
         )
@@ -83,7 +89,8 @@ private fun Stage.nextWinner(prize: Prize) {
         KccImageGrid(
                 "$winner",
                 prize.image,
-                "$prize",
+                prize.name,
+                prize.descr,
                 KccButton("REDRAW", "no.png".asImage()) {
                     log("--- Prize was rejected by $winner")
                     nextWinner(prize)
@@ -102,13 +109,13 @@ private fun Stage.recap() {
             add(KccTitle("Winners"), 0, 0, 2, 1)
             val tv = KccTableView {
                 columns.addAll(
-                        column("#", 5) { "${it.pos}" },
-                        column("Winner", 40) { "${it.winner}" },
-                        column("Prize", 54) { "${it.prize}" }
+                        column("#", 5) { "${it.prize.pos}" },
+                        column("Winner", 27) { "${it.winner}" },
+                        column("Prize", 67) { "${it.prize}" }
                 )
-                items = FXCollections.observableArrayList(results)
-                minWidth = 3 * W
-                minHeight = 6 * H
+                items = FXCollections.observableArrayList(results.sortedBy { it.prize.pos })
+                minWidth = 4 * W
+                minHeight = 7 * H
             }
             add(tv, 0, 1, 7, 2)
         }
@@ -119,10 +126,13 @@ class KccScene(root: () -> Parent) : Scene(root(), 4 * W + 2 * PAD, 8 * H + 2 * 
 
 open class KccGrid(builder: GridPane.() -> Unit = {}) : GridPane() {
     init {
+        columnConstraints.addAll(intArrayOf(50, 50).map { percent ->
+            ColumnConstraints().apply { percentWidth = percent.toDouble() }
+        })
         alignment = Pos.CENTER
         hgap = PAD
         vgap = PAD
-        padding = Insets(PAD, PAD, PAD, PAD)
+        padding = Insets(PAD)
         background = Background(BackgroundFill(Paint.valueOf("white"), CornerRadii.EMPTY, Insets.EMPTY))
         apply(builder)
     }
@@ -130,17 +140,19 @@ open class KccGrid(builder: GridPane.() -> Unit = {}) : GridPane() {
 
 class KccImageGrid(title: String = "#KCC18",
                    image: String = ICON,
-                   descr: String = "",
+                   note1: String = "",
+                   note2: String = "",
                    vararg buttons: KccButton) : KccGrid() {
     init {
-        columnConstraints.addAll(constraints(50, 50))
         add(KccTitle(title), 0, 0, 2, 1)
         add(KccImage(image), 0, 1, 4, 4)
-        add(KccTitle(descr), 0, 5, 2, 2)
-        buttons.forEachIndexed { index, kccButton ->
-            val colspan = 2 / buttons.size
-            kccButton.minWidth = colspan * 2 * W
-            add(kccButton, index, 7, colspan, 1)
+        add(KccTitle(note1, FONT_HEIGHT_NOTES), 0, 5, 2, 1)
+        add(KccTitle(note2, FONT_HEIGHT_NOTES), 0, 6, 2, 1)
+        val count = buttons.size
+        val colSpan = 2 / count
+        buttons.forEachIndexed { index, button ->
+            button.minWidth = colSpan * 2 * W
+            add(button, index, 7, colSpan, 1)
         }
     }
 
@@ -148,16 +160,16 @@ class KccImageGrid(title: String = "#KCC18",
 
 sealed class KccBox : VBox() {
     init {
-        minWidth(2 * W)
+        minWidth(4 * W)
         alignment = Pos.CENTER
     }
 }
 
-class KccTitle(text: String = "") : KccBox() {
+class KccTitle(text: String = "", fontSize: Double = FONT_HEIGHT_TITLE) : KccBox() {
     init {
         val txt = Text(text)
         txt.textAlignment = TextAlignment.CENTER
-        txt.font = Font.font("Brandon Grotesque", FontWeight.BOLD, H1)
+        txt.font = Font.font("Brandon Grotesque", FontWeight.BOLD, fontSize)
         children.add(txt)
     }
 }
@@ -166,21 +178,26 @@ class KccButton(text: String = "", image: Image? = null, action: (Any) -> Unit) 
     init {
         if (image != null) graphic = ImageView(image)
         textAlignment = TextAlignment.CENTER
-        font = Font.font("Brandon Grotesque", FontWeight.NORMAL, H3)
+        font = Font.font("Brandon Grotesque", FontWeight.NORMAL, FONT_HEIGHT_BUTTON)
+        cursor = Cursor.HAND
         setOnAction(action)
     }
 }
 
 class KccImage(imageFileName: String) : KccBox() {
     init {
-        children.add(ImageView(
+        val imageView = ImageView(
                 try {
                     imageFileName.asImage()
                 } catch (e: Exception) {
                     System.err.println("Invalid image file $imageFileName")
                     ICON.asImage()
                 }
-        ))
+        ).apply {
+            fitHeight = 4 * H
+            isPreserveRatio = true
+        }
+        children.add(imageView)
     }
 }
 
@@ -199,15 +216,21 @@ class KccTableView(builder: KccTableView.() -> Unit) : TableView<Result>() {
 class KccTableColumn(title: String, f: (Result) -> String) : TableColumn<Result, String>(title) {
     init {
         cellValueFactory = Callback { param -> ReadOnlyObjectWrapper<String>(f(param.value)) }
+        cellFactory = Callback<TableColumn<Result, String>, TableCell<Result, String>> { KccTableCell() }
+    }
+}
+
+class KccTableCell : TableCell<Result, String>() {
+    override fun updateItem(item: String?, empty: Boolean) {
+        if (item != null) {
+            text = item
+            font = Font.font("Brandon Grotesque", FontWeight.NORMAL, FONT_HEIGHT_RECAP)
+        }
     }
 }
 
 
 fun String.asImage() = Image(RaffleApp::class.java.getResourceAsStream("/${this}"))
-
-fun constraints(vararg percentWidths: Int) = percentWidths.map { percent ->
-    ColumnConstraints().apply { percentWidth = percent.toDouble() }
-}
 
 fun log(s: String) = logger.debug(s)
 

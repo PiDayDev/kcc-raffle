@@ -1,7 +1,7 @@
 package it.intre.kcc.raffle
 
-data class Prize(val name: String, val descr: String, val image: String, val secret: String = "") {
+data class Prize(val pos: Int, val name: String, val descr: String, val image: String, val secret: String = "") {
     override fun toString() = "$name ($descr)"
 }
 
-val NONE = Prize("nothing", "", "http://no.image.png")
+val NONE = Prize(0, "nothing", "", "http://no.image.png")
