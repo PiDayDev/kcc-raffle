@@ -1,5 +1,6 @@
 package it.intre.kcc.raffle
 
+import javafx.animation.Transition
 import javafx.application.Application
 import javafx.application.Application.launch
 import javafx.beans.property.ReadOnlyObjectWrapper
@@ -23,7 +24,9 @@ import javafx.scene.text.Text
 import javafx.scene.text.TextAlignment
 import javafx.stage.Stage
 import javafx.util.Callback
+import javafx.util.Duration
 import org.slf4j.LoggerFactory
+import java.text.Normalizer
 
 /**
  * @author Damiano Salvi, Intré Srl
@@ -61,6 +64,7 @@ private fun Stage.welcome() {
                 ICON,
                 "#KCC18 raffle",
                 "We have a staggering total of ${engine.store.prizes.size} prizes!",
+                false,
                 KccButton("LET'S GO !") { nextPrize() }
         )
     }
@@ -78,6 +82,7 @@ private fun Stage.nextPrize() {
                 prize.image,
                 prize.name,
                 prize.descr,
+                false,
                 KccButton("DRAW !") { nextWinner(prize) }
         )
     }
@@ -91,6 +96,7 @@ private fun Stage.nextWinner(prize: Prize) {
                 prize.image,
                 prize.name,
                 prize.descr,
+                true,
                 KccButton("REDRAW", "no.png".asImage()) {
                     log("--- Prize was rejected by $winner")
                     nextWinner(prize)
@@ -138,13 +144,20 @@ open class KccGrid(builder: GridPane.() -> Unit = {}) : GridPane() {
     }
 }
 
-class KccImageGrid(title: String = "#KCC18",
-                   image: String = ICON,
-                   note1: String = "",
-                   note2: String = "",
+class KccImageGrid(title: String,
+                   image: String,
+                   note1: String,
+                   note2: String,
+                   animate: Boolean,
                    vararg buttons: KccButton) : KccGrid() {
     init {
-        add(KccTitle(title), 0, 0, 2, 1)
+        val row1 = KccTitle("")
+        add(row1, 0, 0, 2, 1)
+        if (animate) {
+            KccTransition(row1, title).play()
+        } else {
+            row1.text = title
+        }
         add(KccImage(image), 0, 1, 4, 4)
         add(KccTitle(note1, FONT_HEIGHT_NOTES), 0, 5, 2, 1)
         add(KccTitle(note2, FONT_HEIGHT_NOTES), 0, 6, 2, 1)
@@ -155,7 +168,16 @@ class KccImageGrid(title: String = "#KCC18",
             add(button, index, 7, colSpan, 1)
         }
     }
+}
 
+class KccTransition(private val element: KccTitle, private val text: String) : Transition() {
+    init {
+        cycleDuration = Duration.millis(642.0)
+    }
+
+    override fun interpolate(frac: Double) {
+        element.text = if (frac >= 1.0) text else text.randomize(frac)
+    }
 }
 
 sealed class KccBox : VBox() {
@@ -166,11 +188,17 @@ sealed class KccBox : VBox() {
 }
 
 class KccTitle(text: String = "", fontSize: Double = FONT_HEIGHT_TITLE) : KccBox() {
+    private val textNode = Text(text)
+    var text: String
+        get() = textNode.text
+        set(value) {
+            textNode.text = value
+        }
+
     init {
-        val txt = Text(text)
-        txt.textAlignment = TextAlignment.CENTER
-        txt.font = Font.font("Brandon Grotesque", FontWeight.BOLD, fontSize)
-        children.add(txt)
+        textNode.textAlignment = TextAlignment.CENTER
+        textNode.font = Font.font("Brandon Grotesque", FontWeight.BOLD, fontSize)
+        children.add(textNode)
     }
 }
 
@@ -229,8 +257,13 @@ class KccTableCell : TableCell<Result, String>() {
     }
 }
 
-
 fun String.asImage() = Image(RaffleApp::class.java.getResourceAsStream("/${this}"))
+
+fun String.randomize(frac: Double) =
+        Normalizer.normalize(this, Normalizer.Form.NFC)
+                .toLowerCase().toList().shuffled()
+                .take((frac * (2 - frac) * length).toInt()).joinToString("").split(" ")
+                .joinToString(" ") { it.capitalize() }
 
 fun log(s: String) = logger.debug(s)
 
