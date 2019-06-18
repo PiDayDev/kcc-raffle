@@ -34,7 +34,7 @@ import java.text.Normalizer
 class RaffleApp : Application() {
 
     override fun start(stage: Stage) {
-        stage.title = "Milan Kotlin Community Conf 2018 raffle"
+        stage.title = "Working Software 2019 raffle"
         stage.icons.add(ICON.asImage())
 
         stage.welcome()
@@ -60,9 +60,9 @@ val logger = LoggerFactory.getLogger("KCC")!!
 private fun Stage.welcome() {
     scene = KccScene {
         KccImageGrid(
-                "Milan Kotlin Community Conf",
+                "Working Software",
                 ICON,
-                "#KCC18 raffle",
+                "#WSC2019 raffle",
                 "We have a staggering total of ${engine.store.prizes.size} prizes!",
                 false,
                 KccButton("LET'S GO !") { nextPrize() }
