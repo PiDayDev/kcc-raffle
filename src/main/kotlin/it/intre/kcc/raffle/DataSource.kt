@@ -29,14 +29,17 @@ class MemoryDataSource : DataSource {
 
 class CsvDataSource : DataSource {
 
-    override fun getAttendees(): List<Attendee> = list("attendees.csv").map { Attendee(it[0], it[1], it[2]) }
+    override fun getAttendees(): List<Attendee> = list("attendees.csv")
+            .map { Attendee(it[0], it[1], it[2]) }
 
-    override fun getPrizes(): List<Prize> = list("prizes.csv").map { Prize(it[0].trim().toIntOrNull() ?: 0, it[1], it[2], it[3], it[4]) }
+    override fun getPrizes(): List<Prize> = list("prizes.csv")
+            .map { Prize(it[0].trim().toIntOrNull() ?: 0, it[1], it[2], it[3], it[4]) }
 
     private fun list(file: String): List<List<String>> = File(ClassLoader.getSystemResource(file).file)
             .readLines()
             .drop(1) // field names
             .distinct() // no duplicates
+            .filter { it.trim().isNotEmpty() }
             .map { it.split(",") }
 
 }
