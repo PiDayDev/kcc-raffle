@@ -273,6 +273,6 @@ fun save(winner: Attendee, prize: Prize) {
     logger.trace(">>> Mail: ${winner.mail} | Prize secret: ${prize.secret}")
 }
 
-fun main(args: Array<String>) {
+fun main() {
     launch(RaffleApp::class.java)
 }

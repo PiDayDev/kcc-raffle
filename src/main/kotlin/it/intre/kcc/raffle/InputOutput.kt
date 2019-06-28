@@ -70,7 +70,7 @@ class WindowOutput : InputOutput {
     init {
         object : Thread() {
             override fun run() {
-                javafx.application.Application.launch(Panel::class.java)
+                Application.launch(Panel::class.java)
             }
         }.start()
         panel = Panel()

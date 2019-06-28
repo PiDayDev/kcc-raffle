@@ -1,6 +1,6 @@
 package it.intre.kcc.raffle
 
-sealed class Raffle(val engine: Engine, val inout: InputOutput) {
+sealed class Raffle(private val engine: Engine, private val inout: InputOutput) {
 
     fun drawPrizes() {
         while (engine.hasPrizes()) {
