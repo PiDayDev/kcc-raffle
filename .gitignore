@@ -77,3 +77,4 @@ src/main/resources/*.csv
 %USER_HOME%
 
 **/*.docx
+**/*.xlsx
