@@ -1,4 +1,4 @@
-group = "it.intre.kcc"
+group = "it.intre"
 version = "1.0-SNAPSHOT"
 
 plugins {
@@ -19,5 +19,5 @@ dependencies {
 }
 
 application {
-    mainClassName = "it.intre.kcc.raffle.RaffleAppKt"
+    mainClassName = "it.intre.conf.raffle.RaffleAppKt"
 }

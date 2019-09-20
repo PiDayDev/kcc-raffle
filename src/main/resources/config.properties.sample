@@ -1,0 +1,7 @@
+# Application title
+app.title = Raffle for <your conference name>
+
+# Welcome page
+welcome.title = <Your conference name>
+welcome.logo = ghost.png
+welcome.note = #hashtag raffle
