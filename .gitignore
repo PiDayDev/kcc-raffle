@@ -78,3 +78,5 @@ src/main/resources/*.csv
 
 **/*.docx
 **/*.xlsx
+/.gradle/
+/build/
