@@ -3,12 +3,12 @@ version = "1.0-SNAPSHOT"
 
 plugins {
     application
-    kotlin("jvm") version "1.3.31"
+    kotlin("jvm") version "1.4.32"
+    id("org.openjfx.javafxplugin") version "0.0.9"
 }
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 dependencies {
@@ -18,6 +18,10 @@ dependencies {
     testCompile("junit", "junit", "4.12")
 }
 
+javafx {
+    modules("javafx.controls", "javafx.fxml")
+}
+
 application {
-    mainClassName = "it.intre.conf.raffle.RaffleAppKt"
+    mainClass.set("it.intre.conf.raffle.RaffleAppKt")
 }

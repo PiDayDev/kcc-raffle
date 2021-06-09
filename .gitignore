@@ -34,3 +34,4 @@ src/main/resources/config.properties
 **/*.xlsx
 /.gradle/
 /build/
+/src/main/resources/resources.7z

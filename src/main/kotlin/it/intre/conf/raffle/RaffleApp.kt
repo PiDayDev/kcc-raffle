@@ -44,12 +44,12 @@ val logger = LoggerFactory.getLogger("raffle")!!
 private fun Stage.welcome() {
     scene = RaffleScene {
         RaffleImageGrid(
-                config.welcomeTitle,
-                config.welcomeLogo,
-                config.welcomeNote,
-                "We have a staggering total of ${engine.store.prizes.size} prizes!",
-                false,
-                RaffleButton("LET'S GO !") { nextPrize() }
+            config.welcomeTitle,
+            config.welcomeLogo,
+            config.welcomeNote,
+            "We have a staggering total of ${engine.store.prizes.size} prizes!",
+            false,
+            RaffleButton("LET'S GO !") { nextPrize() }
         )
     }
 }
@@ -62,12 +62,12 @@ private fun Stage.nextPrize() {
     }
     scene = RaffleScene {
         RaffleImageGrid(
-                "Prize #${prize.pos}",
-                prize.image,
-                prize.name,
-                prize.descr,
-                false,
-                RaffleButton("DRAW !") { nextWinner(prize) }
+            "Prize #${prize.pos}",
+            prize.image,
+            prize.name,
+            prize.descr,
+            false,
+            RaffleButton("DRAW !") { nextWinner(prize) }
         )
     }
 }
@@ -76,19 +76,19 @@ private fun Stage.nextWinner(prize: Prize) {
     val winner = engine.nextWinner()
     scene = RaffleScene {
         RaffleImageGrid(
-                "$winner",
-                prize.image,
-                prize.name,
-                prize.descr,
-                true,
-                RaffleButton("REDRAW", "no.png".asImage()) {
-                    log("--- Prize was rejected by $winner")
-                    nextWinner(prize)
-                },
-                RaffleButton("OK", "yes.png".asImage()) {
-                    save(winner, prize)
-                    nextPrize()
-                }
+            "$winner",
+            prize.image,
+            prize.name,
+            prize.descr,
+            true,
+            RaffleButton("REDRAW", "no.png".asImage()) {
+                log("--- Prize was rejected by $winner")
+                nextWinner(prize)
+            },
+            RaffleButton("OK", "yes.png".asImage()) {
+                save(winner, prize)
+                nextPrize()
+            }
         )
     }
 }
@@ -99,9 +99,9 @@ private fun Stage.recap() {
             add(RaffleTitle("Winners"), 0, 0, 2, 1)
             val tv = RaffleTableView {
                 columns.addAll(
-                        column("#", 5) { "${it.prize.pos}" },
-                        column("Winner", 27) { "${it.winner}" },
-                        column("Prize", 67) { "${it.prize}" }
+                    column("#", 5) { "${it.prize.pos}" },
+                    column("Winner", 27) { "${it.winner}" },
+                    column("Prize", 67) { "${it.prize}" }
                 )
                 items = FXCollections.observableArrayList(results.sortedBy { it.prize.pos })
                 minWidth = 4 * W
@@ -122,13 +122,17 @@ class RaffleTransition(private val element: RaffleTitle, private val text: Strin
     }
 }
 
-fun String.asImage() = Image(RaffleApp::class.java.getResourceAsStream("/${this}"))
+fun String.asImage() = try {
+    Image(RaffleApp::class.java.getResourceAsStream("/${this}"))
+} catch (e: Exception) {
+    Image(RaffleApp::class.java.getResourceAsStream("/ghost.png"))
+}
 
 fun String.randomize(frac: Double) =
-        Normalizer.normalize(this, Normalizer.Form.NFC)
-                .toLowerCase().toList().shuffled()
-                .take((frac * (2 - frac) * length).toInt()).joinToString("").split(" ")
-                .joinToString(" ") { it.capitalize() }
+    Normalizer.normalize(this, Normalizer.Form.NFC)
+        .toLowerCase().toList().shuffled()
+        .take((frac * (2 - frac) * length).toInt()).joinToString("").split(" ")
+        .joinToString(" ") { it.capitalize() }
 
 fun log(s: String) = logger.debug(s)
 
