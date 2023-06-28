@@ -25,8 +25,8 @@ class RaffleApp : Application() {
     }
 }
 
-const val W = 800 * 1.618 / 4
-const val H = 800.0 / 8
+const val W = 1600.0 / 4
+const val H = 900.0 / 8
 const val FONT_HEIGHT_TITLE = H * 0.80
 const val FONT_HEIGHT_NOTES = H * 0.50
 const val FONT_HEIGHT_RECAP = H * 0.185

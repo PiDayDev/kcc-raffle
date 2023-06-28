@@ -3,13 +3,16 @@ package it.intre.conf.raffle.ux
 import it.intre.conf.raffle.FONT_HEIGHT_NOTES
 import it.intre.conf.raffle.RaffleTransition
 import it.intre.conf.raffle.W
+import kotlin.math.min
 
-class RaffleImageGrid(title: String,
-                      image: String,
-                      note1: String,
-                      note2: String,
-                      animate: Boolean,
-                      vararg buttons: RaffleButton) : RaffleGrid() {
+class RaffleImageGrid(
+    title: String,
+    image: String,
+    note1: String,
+    note2: String,
+    animate: Boolean,
+    vararg buttons: RaffleButton,
+) : RaffleGrid() {
     init {
         val row1 = RaffleTitle("")
         add(row1, 0, 0, 2, 1)
@@ -20,7 +23,11 @@ class RaffleImageGrid(title: String,
         }
         add(RaffleImage(image), 0, 1, 4, 4)
         add(RaffleTitle(note1, FONT_HEIGHT_NOTES), 0, 5, 2, 1)
-        add(RaffleTitle(note2, FONT_HEIGHT_NOTES), 0, 6, 2, 1)
+
+        val maxScale = 0.9
+        val scale = (55.0 / (1 + note2.length))
+        add(RaffleTitle(note2, FONT_HEIGHT_NOTES * min(scale, maxScale)), 0, 6, 2, 1)
+
         val count = buttons.size
         val colSpan = 2 / count
         buttons.forEachIndexed { index, button ->
